@@ -1,0 +1,40 @@
+{
+  "name": "dsaSuperpixelAnnotator",
+  "version": "1.0.0",
+  "description": "This is code to help generate superpixels or tile based boundaries for large images stored in Girder.  In addition, there is a prototype UI that will support visualization of the boudnaries overlaid on the large images and allow some simple markup capabilities.",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server --mode development --open",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dgutman/dsaSuperpixelAnnotator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dgutman/dsaSuperpixelAnnotator/issues"
+  },
+  "homepage": "https://github.com/dgutman/dsaSuperpixelAnnotator#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
+    "webpack": "^4.22.0",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.9"
+  },
+  "dependencies": {
+    "d3": "^5.7.0",
+    "fs": "0.0.1-security",
+    "jquery": "^3.3.1",
+    "list-files-in-dir": "^0.1.5",
+    "openseadragon": "^2.4.0",
+    "webix": "^6.0.5"
+  }
+}

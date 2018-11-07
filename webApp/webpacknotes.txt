@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="node_modules/webix/webix.css" type="text/css" charset="utf-8">
+    <script src="node_modules/webix/webix.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
+    <title>dsaSuperpixel Viewer</title>
+</head>
+
+<body>
+    <script>
+    import webix from "webix"
+    webix.message("hello world");
+    console.log("Is hwebbig loaded in scope?")
+   
+    </script>
+</body>
+
+</html>
+
+ //Initializing Seadragon, setting needed options
+    // setTileSources(obj) {
+    //         return {
+    //                 width: params.width,
+    //                 height: params.height,
+    //                 tileWidth: params.tileWidth,
+    //                 tileHeight: params.tileHeight,
+    //                 minLevel: params.minLevel,
+    //                 maxLevel: params.maxLevel,
+    //                 getTileUrl: function (level, x, y) {
+    //                         return ajax.getImageTileUrl(obj._id, level, x, y);
+    //                 }
+    //         };
+    // }
+
+    // createOpenSeadragonViewer(obj, templateNode) {
+    //         this.viewer = new OpenSeadragon.Viewer({
+    //                 element: templateNode,
+    //                 prefixUrl: "sources/images/images/",
+    //                 imageLoaderLimit: 1,
+    //                 tileSources: this.setTileSources(obj)
+    //         });
+    //         return this.viewer;
+    // }
+
+    // this.getHeaderTemplateView().parse(obj);
+    //  getHeaderTemplateView() {
+    //                return this.getRoot().queryView({name: "headerTemplate"});
+    //        }
+
+    //          const templateViewer = {
+    //                        view: "template",
+    //                        css: "absolute-centered-image-template",
+    //                        name: "largeImageTemplate",
+    //                        scroll: false,
+    //                        template: (obj) => {
+    //                                if (obj._id && !obj.emptyObject) {
+    //                                        if (typeof galleryImageUrl.getNormalImageUrl(obj._id) === "undefined") {
+    //                                                this.view.showProgress();
+    //                                                galleryImageUrl.setNormalImageUrl(obj._id, "");
+    //                                                ajax.getImage(obj._id, HEIGHT, WIDTH)
+    //                                                        .then((data) => {
+    //                                                                galleryImageUrl.setNormalImageUrl(obj._id, URL.createObjectURL(data));
+    //                                                                this.view.hideProgress();
+    //                                                                this.getLargeTemplateView().refresh();
+    //                                                        }).fail((error) => {
+    //                                                                console.log(error);
+    //                                                                this.view.hideProgress();
+    //                                                        });
+    //                                        }
+    //                                        return `<img src="${galleryImageUrl.getNormalImageUrl(obj._id) || ""}">`;
+    //                                } else return "<div></div>";
+    //                        },
+    //                        borderless: true
+    //                };
+
+
+    //  const templateNode = this.getLargeTemplateView().getNode();
+    //                if (viewer === "seadragon") {
+    //                        this.view.showProgress();
+    //                        ajax.getImageTiles(obj._id)
+    //                                .then((data) => {
+    //                                        params = {
+    //                                                width: data.sizeX,
+    //                                                height: data.sizeY,
+    //                                                tileWidth: data.tileWidth,
+    //                                                tileHeight: data.tileHeight,
+    //                                                minLevel: 0,
+    //                                                maxLevel: data.levels - 1,
+    //                                        };
+    //                                        this.getLargeTemplateView().define("scroll", "false");
+    //                                        this.getLargeTemplateView().define("move", "true");
+    //                                        this.createOpenSeadragonViewer(obj, templateNode.firstChild);
+    //                                        this.view.hideProgress();
+    //                                }).fail((error) => {
+    //                                        console.log(error);
+    //                                        this.view.hideProgress();
+    //                                });

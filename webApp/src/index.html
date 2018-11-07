@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="node_modules/webix/webix.js" type="text/javascript" charset="utf-8"></script>
+    <script src="node_modules/jquery/dist/jquery.js" type="text/javascript" charset="utf-8"></script>
+    <script src="node_modules/jquery/dist/jquery.js" type="text/javascript" charset="utf-8"></script>
+    <script src="node_modules/openseadragon/build/openseadragon/openseadragon.js" type="text/javascript" charset="utf-8"></script>
+    <script src="src/openseadragon-svg-overlay.js" type="text/javascript" charset="utf-8"></script>
+    <script src="node_modules/d3/dist/d3.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="node_modules/webix/webix.css" type="text/css" charset="utf-8">
+    <style type="text/css">
+    html,
+    body,
+    .openseadragon1 {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+    }
+    </style>
+    <title>dsaSuperpixel Viewer</title>
+</head>
+
+<body>
+    <div class="viewerContainer"> </div>
+    <div id="osdViewer1" class="openseadragon1"></div>
+    <script>
+    webix.protoUI({
+        name: "webixOSD",
+        $init: function(config) {
+            this.$view.innerHTML = "<div>OSD GOES HERE</div>";
+        },
+        defaults: {
+            width: 800, //ideally these are dynamic
+            height: 800
+        }
+    }, webix.ui.view);
+
+
+    var rightPanel = {
+        rows: [
+            {view:"template", id:"activeTile", template:"#tileID#"},
+        ],
+        gravity: 0.2
+    }
+
+    function buildLayerToggleView(toggleName, osdLayer) {
+
+        return {
+            view: "switch",
+            onLabel: "On",
+            offLabel: "off",
+            id: toggleName,
+            label: toggleName,
+            value: 1,
+            on: {
+                onChange: function(val) {
+                    viewer.world.getItemAt(osdLayer).setOpacity(val / 4);
+                }
+            }
+        }
+    }
+
+
+    var leftPanel = {
+        rows: [
+            { view: "template", template: "Controls" },
+            buildLayerToggleView("baseImg", 0),
+            buildLayerToggleView("1024spx", 1),
+            buildLayerToggleView("2048spx", 2),
+
+        ],
+        gravity: 0.5
+    }
+
+    var middlePanel = { content: "osdViewer1" }
+
+
+    var layout = {
+        cols: [leftPanel, { view: "resizer" },
+            middlePanel, rightPanel
+        ]
+    }
+
+    webix.ready(function() {
+        webix.ui(layout);
+    });
+
+    var viewer = "Coming Soon to an asyn browser near you!"
+
+
+
+    var macroImage = {
+        type: 'image',
+        url: 'macroImages/TCGA-A6-2680-01Z-00-DX1.spxBaseImage.mag.0.625.png',
+        buildPyramid: true,
+        opacity: 1.0
+    }
+
+    var spxImage1024 = {
+        type: 'image',
+        url: 'macroImages/TCGA-A6-2680-01Z-00-DX1.mag.0.625.spx.1024.png',
+        buildPyramid: true,
+        opacity: 0.25
+    }
+
+    var spxImage2048 = {
+        type: 'image',
+        url: 'macroImages/TCGA-A6-2680-01Z-00-DX1.mag.0.625.spx.2048.png',
+        buildPyramid: true,
+        opacity: 0.25
+    }
+    tileSet = [{tileSource:macroImage, width:629}, spxImage1024, spxImage2048];
+
+    viewer = new OpenSeadragon({
+        id: "osdViewer1",
+        prefixUrl: "https://cdn.jsdelivr.net/npm/openseadragon@2.3/build/openseadragon/images/",
+        maxZoomPixelRatio: 5, //Remember eventually you are rendering a single iamge pixel on multiple pixels
+        tileSources: tileSet
+    });
+
+
+    viewer.addHandler('open', function(event) {
+        tileSet.forEach(function(v, idx) {
+            viewer.world.getItemAt(idx).setOpacity(v.opacity)
+        })
+    })
+
+
+    var categorical = [
+        { "name": "schemeAccent", "n": 8 },
+        { "name": "schemeDark2", "n": 8 },
+        { "name": "schemePastel2", "n": 8 },
+        { "name": "schemeSet2", "n": 8 },
+        { "name": "schemeSet1", "n": 9 },
+        { "name": "schemePastel1", "n": 9 },
+        { "name": "schemeCategory10", "n": 10 },
+        { "name": "schemeSet3", "n": 12 },
+        { "name": "schemePaired", "n": 12 },
+        { "name": "schemeCategory20", "n": 20 },
+        { "name": "schemeCategory20b", "n": 20 },
+        { "name": "schemeCategory20c", "n": 20 }
+    ]
+
+  function handleMouseOver(d, i) {
+        // Add interactivity
+
+
+            $$("activeTile").parse({"tileID":this.id})
+
+        // console.log(this.id);
+        // Use D3 to select element, change color and size
+        //             d3.select(this.id).attr({
+        //               fill: "orange",
+        //               opacity: 1
+        // /*              r: radius * 2*/
+        //             });
+        //THIS ITERATION ALLOWS ME TO PAINT!!
+      }
+
+
+    function addOverlay(tiles,overlayPtr) {
+         colorScale = d3.scaleOrdinal(d3[categorical[8].name])
+          // console.log(colorScale);
+
+        $.each(tiles, function(index, tile) {
+
+
+
+            fillColor = colorScale(index % 20);
+            // console.log(index,fillColor);
+           // console.log(index, tile, fillColor);
+
+            d3.select(overlayPtr.node())
+                .append('polygon')
+//                .attr('points', tile.geometry.coordinates.join(' '))
+                .attr('points', tile.geometry.coordinates)
+                .style('fill', fillColor)
+                .attr('opacity', 0.4)
+                .attr('class', 'boundaryClass')
+                .attr('id', 'boundaryLI' + tile.properties.labelindex)
+                .attr('stroke', 'red')
+                .attr('stroke-width', 1)
+                .on('mouseover', handleMouseOver);
+        });
+    }
+
+    //addOverlay(sampleSVG);
+
+
+
+
+    $(document).ready(function() {
+
+        var overlay = viewer.svgOverlay();
+
+        var d3Rect = d3.select(overlay.node()).append("rect")
+            .style('fill', 'green')
+            .attr("x", 0.2)
+            .attr("width", 0.25)
+            .attr("y", 0.2)
+            .attr("height", 0.15);
+
+
+
+        var svgJSONData = webix.ajax().sync().get(spxImage1024.url + ".svg.json", function(data)
+
+            {
+                spxData = JSON.parse(data);
+                //console.log(spxData);
+                     addOverlay(spxData,overlay);
+            });
+
+        $(window).resize(function() {
+            overlay.resize();
+        });
+    });
+    </script>
+</body>
+
+</html>
+<script>
+//function generateMaskControls(viewerId, imageId, imgName) {
+/* This will build a webix view to manipulate an image in papaya
+viewerId refers to the papayaViewer number, this starts at 0, but you can have multiple viewers in the same web page
+imageId refers to the layer, 0 is the base image, and then each additional overlay image goes from there, this is one of the things I need to sync*/
+
+
+
+/*This will need some work, but this allows me to create a new papaya viewer while using webix to control location by creating a prototype */
+
+//this will be moved to a combo box or config at some point.. these are predefined color tables
+
+
+// overlay.onClick(d3Rect.node(), function() {
+//     console.log('click', arguments);
+// });
+
+
+// function transformCoords(tiles, imageWidth) {
+//     coordinates = new Array(tiles.length);
+//     scaleFactor = 1 / imageWidth;
+//     $.each(tiles, function(index, tile) {
+//         var tileCoords = new Array;
+//         $.each(tile.geometry.coordinates, function(junk, coords) {
+//             x = coords[0] * scaleFactor;
+//             y = coords[1] * scaleFactor;
+//             tileCoords.push(x + "," + y);
+//         });
+
+//         index = parseInt(tile.properties.labelindex);
+//         index = index > tiles.length ? 0 : index;
+
+//         coordinates[index] = {
+//             index: index,
+//             coords: tileCoords.join(" ")
+//         };
+//     });
+
+//     return coordinates;
+// }
+
+// function addOverlay(tiles) {
+//     console.log(tiles);
+//     $.each(tiles, function(index, tile) {
+
+//         fillColor = d3.schemeCategory10[tile.index % 10];
+//         d3.select(overlay.node()).append("polygon")
+//             .attr("points", tile.coords)
+//             .style('fill', "blue")
+//             .attr('opacity', 0.2)
+//             .attr('class', 'boundaryClass')
+//             .attr('id', 'boundaryLI' + tile.index)
+//             .attr('stroke', 'blue')
+//             .attr('stroke-width', 0.001);
+//     });
+// }
+
+// $.get("demoImages/sampleSuperPixelImage.png.svg.json", function(data) {
+//     console.log(data);
+
+//     // data = JSON.parse(data);
+//     s = {}
+//     //                            tile.sizeX = 10000;
+
+//     s.tiles = transformCoords(data, 1024);
+//     //  console.log(s.tiles);
+//     console.log("Loaded", data.length, "super pixels for", name);
+//     addOverlay(s.tiles);
+
+// })
+
+
+
+// for (var i = 0; i < 3; i++) {
+//     addcheckbox(i);
+// }
+//     var imgCtrView =
+
+//         {
+//             rows: [{
+//                     type: "header",
+//                     template: imgName
+//                 },
+//                 {
+//                     cols: [{
+//                             view: "switch",
+//                             value: 1,
+//                             label: "Visible",
+//                             onLabel: "on",
+//                             offLabel: "off",
+//                             on: {
+//                                 onChange: function(newv, oldv) {
+//                                     webix.message("value toggled");
+//                                     console.log("switch clickd")
+//                                     papayaContainers[viewerId].viewer.toggleOverlay(imageId)
+
+//                                 }
+//                             }
+//                         }, //toggle on/off the individual layer
+//                         {
+//                             view: "slider",
+//                             label: "opacity",
+//                             value: "1",
+//                             min: 0,
+//                             max: 1,
+//                             step: 0.05,
+//                             labelWidth: 100,
+//                             inputWidth: 250,
+//                             name: "s2",
+//                             on: {
+//                                 "onChange": function(newv, oldv) {
+//                                     papayaContainers[viewerId].viewer.screenVolumes[imageId].alpha = newv;
+//                                     papayaContainers[viewerId].viewer.drawViewer(true, false);
+//                                 }
+//                             }
+//                         }
+//                     ]
+//                 },
+//                 {
+//                     view: "combo",
+//                     label: "LUT",
+//                     //autowidth:true,//why does this screw it up so bad!
+//                     labelWidth: 250,
+//                     inputWidth: 400,
+//                     options: papayaColorTables,
+//                     on: {
+//                         "onChange": function(newv, oldv) {
+//                             webix.message(newv);
+//                             myViewer = papayaContainers[viewerId].viewer;
+//                             //To Do.... Unclear why I need to pass myViewer to this
+//                             papayaContainers[viewerId].viewer.screenVolumes[imageId].changeColorTable(myViewer, newv)
+//                         }
+//                     }
+//                 },
+//                 {
+//                     //trying to make a control where rI can set min and max as inputs but also have a slider
+
+//                     cols: [{
+//                             view: "counter",
+//                             label: "min",
+//                             step: 1,
+//                             value: 0,
+//                             min: 0,
+//                             max: 10000,
+//                             on: {
+//                                 onChange: function(newv, oldv) {
+//                                     ///need to change the screen min if this chnages
+//                                     papayaContainers[viewerId].viewer.screenVolumes[imageId].screenMin = newv;
+//                                     papayaContainers[0].viewer.drawViewer(true, false);
+//                                     //TO DO, maybe think about adding ability to change the step value dynamically
+//                                     //or somehow scale it
+//                                 }
+//                             }
+//                         },
+//                         {
+//                             view: "slider",
+//                             id: "imgMinMaxSldr" + imageId,
+//                             min: 0,
+//                             max: 500,
+//                             on: {
+//                                 onChange: function(newv, oldv) {
+//                                     webix.message("Sliding around")
+//                                     //this is not correct behavior the slider... but ill have to figure it out
+//                                     papayaContainers[viewerId].viewer.screenVolumes[imageId].screenMin = newv;
+//                                     papayaContainers[0].viewer.drawViewer(true, false);
+//                                 }
+//                             }
+//                         }, ///the min and max of this should be set or updatable be below
+//                         {
+//                             view: "counter",
+//                             label: "max",
+//                             step: 0.5,
+//                             value: 30,
+//                             on: {
+//                                 onChange: function(newv, oldv) {
+//                                     papayaContainers[viewerId].viewer.screenVolumes[imageId].screenMax = newv;
+//                                     //need to figure out how to also set max for the range slider
+//                                     papayaContainers[0].viewer.drawViewer(true, false);
+//                                 }
+
+//                             }
+//                         }
+//                     ]
+//                 },
+//             ]
+//         }
+//     return imgCtrView
+// }
+
+
+// });
+
+// function addcheckbox(index) {
+//     var layers = document.querySelector('.layers');
+//     var div = document.createElement('div');
+//     layers.appendChild(div);
+
+//     var label = document.createElement('label');
+//     div.appendChild(label);
+
+//     var checkbox = document.createElement('input');
+//     checkbox.type = 'checkbox';
+//     checkbox.checked = true;
+//     label.appendChild(checkbox);
+
+//     var labelText = document.createTextNode(' Layer ' + (index + 1));
+//     label.appendChild(labelText);
+
+//     label.addEventListener('click', function() {
+//         viewer.setLayerVisibility(index, !!checkbox.checked);
+//     });
+// }
+// var baseImageControls = generateMaskControls(0, 0, 'baseImage');
+</script>
